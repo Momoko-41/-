@@ -327,7 +327,7 @@ text_analysis/embedding_model/Qwen3-Embedding-8B/
 
 ### 5.6 常见问题
 
-#### 为什么项目里不直接附带 `Qwen3-Embedding-8B`？
+#### 问题 1：为什么项目里不直接附带 `Qwen3-Embedding-8B`？
 
 因为该模型体积大，通常不适合直接放入普通项目压缩包或代码仓库中分发。
 
