@@ -9,11 +9,14 @@
 
 ## 1. 目录结构
 
+说明：本 README 位于当前目录内部，因此下面展示的是**当前目录下的相对结构**，不再额外套一层 `code/`。
+
 ```text
-code/
+.
 ├─ merged_comments.csv
 ├─ question.xlsx
 ├─ question.ipynb
+├─ README.md
 ├─ requirements.txt
 ├─ svo_extracted_results.json
 ├─ text_explore.ipynb
@@ -42,11 +45,11 @@ code/
 │  ├─ svo_top5_community_subgraphs.png
 │  ├─ svo_weighted_network.png
 │  └─ svo_weighted_network_edges.csv
-└─ text_analysis/
-   ├─ embedding_model/
-   │  └─ Qwen3-Embedding-8B/
-   └─ tokenizer/
-      └─ tokenizer.json
+└─ text_analysis/  
+  ├─ embedding_model/            # 如缺失，需要先创建
+  │  └─ Qwen3-Embedding-8B/      # 大模型目录，通常需用 ModelScope 下载
+  └─ tokenizer/
+    └─ tokenizer.json
 ```
 
 ---
@@ -97,8 +100,12 @@ code/
 ### 2.4 `text_analysis/`
 文本分析所依赖的本地资源目录。
 
+如果当前目录下**还没有** `text_analysis/`、`embedding_model/` 或 `Qwen3-Embedding-8B/`，属于正常情况：这类大模型文件通常不会直接随项目一起分发，而是需要使用者在本地手动创建目录并下载。
+
 #### `text_analysis/embedding_model/Qwen3-Embedding-8B/`
 本地嵌入模型目录，包含 Qwen3-Embedding-8B 的模型权重、配置、分词器与说明文件。
+
+该目录**不是必须预先存在**。如果缺失，请参考本文后面的 **ModelScope 下载教学**，将模型下载到这个位置。
 
 在 `text_explore.ipynb` 中，该目录主要用于：
 - 本地加载语义嵌入模型
@@ -109,7 +116,7 @@ code/
 #### `text_analysis/tokenizer/tokenizer.json`
 分词器资源文件，用于与文本编码或预处理流程配合使用。
 
-### 2.6 `outputs/`
+### 2.5 `outputs/`
 所有分析结果的统一输出目录。
 
 ---
@@ -222,3 +229,112 @@ code/
 - PyTorch 额外源：`https://download.pytorch.org/whl/cu130`
 
 如果需要完整复现，优先使用本目录下的 [requirements.txt](requirements.txt)。
+
+---
+
+## 5.补齐 `Qwen3-Embedding-8B`
+
+如果你现在本地**没有**以下目录：
+
+- `text_analysis/`
+- `text_analysis/embedding_model/`
+- `text_analysis/embedding_model/Qwen3-Embedding-8B/`
+
+那么可以按下面步骤补齐。
+
+### 5.1 先创建目录
+
+推荐目标结构：
+
+```text
+text_analysis/
+└─ embedding_model/
+   └─ Qwen3-Embedding-8B/
+```
+
+在 Windows PowerShell 中，可在当前目录执行：
+
+```powershell
+New-Item -ItemType Directory -Force text_analysis\embedding_model | Out-Null
+```
+
+### 5.2 安装 ModelScope
+
+如果当前环境还没有安装 `modelscope`，先安装：
+
+```powershell
+python -m pip install modelscope
+```
+
+如果你使用的是项目虚拟环境，请把上面的 `python` 替换为该虚拟环境解释器。
+
+### 5.3 用 ModelScope 下载模型
+
+最稳妥的方式是使用 Python 脚本下载，并把目标目录明确指定到：
+```text
+text_analysis/embedding_model/Qwen3-Embedding-8B
+```
+
+示例代码：
+
+```python
+from pathlib import Path
+from modelscope.hub.snapshot_download import snapshot_download
+
+target_dir = Path("text_analysis/embedding_model/Qwen3-Embedding-8B")
+target_dir.parent.mkdir(parents=True, exist_ok=True)
+
+snapshot_download(
+  model_id="Qwen/Qwen3-Embedding-8B",
+  local_dir=str(target_dir),
+  local_dir_use_symlinks=False,
+)
+
+print("模型下载完成：", target_dir.resolve())
+```
+
+### 5.4 下载后目录里应当看到什么
+
+下载完成后，`Qwen3-Embedding-8B/` 下会看到这类文件：
+
+- `config.json`
+- `configuration.json`
+- `config_sentence_transformers.json`
+- `modules.json`
+- `tokenizer.json`
+- `tokenizer_config.json`
+- `model.safetensors.index.json`
+- `model-00001-of-00004.safetensors`
+- `model-00002-of-00004.safetensors`
+- `model-00003-of-00004.safetensors`
+- `model-00004-of-00004.safetensors`
+- `1_Pooling/config.json`
+
+只要这些核心文件齐全，笔记就可以按本地目录方式加载。
+
+### 5.5 在笔记中如何对应
+
+本项目的文本分析笔记依赖本地模型目录，因此建议你保持如下路径不变：
+
+```text
+text_analysis/embedding_model/Qwen3-Embedding-8B/
+```
+
+这样做的好处是：
+- 不需要频繁修改 Notebook 路径配置；
+- 可以直接复用本地缓存；
+- 便于不同机器之间统一目录规范。
+
+### 5.6 常见问题
+
+#### 为什么项目里不直接附带 `Qwen3-Embedding-8B`？
+
+因为该模型体积大，通常不适合直接放入普通项目压缩包或代码仓库中分发。
+
+#### 问题 2：下载后还是找不到模型怎么办？
+
+优先检查三件事：
+
+1. 路径是否正确：`text_analysis/embedding_model/Qwen3-Embedding-8B/`
+2. 目录下是否存在 `config.json` 
+3. `model-xxxx-of-xxxx.safetensors` 是否完整下载
