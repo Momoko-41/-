@@ -19,6 +19,8 @@
 ├─ svo_extracted_results.json
 ├─ text_explore.ipynb
 ├─ outputs/
+|  ├─ choice_preference_pies.png
+|  ├─ lpa_choice_cross_analysis.png
 │  ├─ comment_text_embedding_cache.npz
 │  ├─ comment_time_semantic_weights.csv
 │  ├─ comment_token_length_cache.csv
@@ -184,9 +186,8 @@
 3. 描述性统计
 4. 信度与效度分析
 5. 潜在剖面分析
-6. 人口统计学交叉分析
-7. 简单选择型联合分析：多项和二元 Logit 情景分析
-8. fsQCA 主模型、三解报告与稳健性分析
+6. 人口统计学交叉分析、CBC分析与卡方检验
+7. fsQCA 主模型、三解报告与稳健性分析
 
 #### 其核心输入
 - `question.xlsx`
@@ -204,6 +205,8 @@
 - `lpa_abic.png`：潜在剖面模型拟合或 ABIC 结果图
 - `lpa_profiles_combined.png`：潜在剖面特征组合图
 - `lpa_demographics.png`：潜在剖面与人口统计特征对比图
+- `choice_preference_pies.png`：选择偏好分布饼图
+- `lpa_demographics_cross_analysis.png`：潜在剖面与人口统计学交叉分析图
 
 **fsQCA 图表：**
 - `fsqca_necessity_scatter.png`
